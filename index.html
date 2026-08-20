@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TrustRail — Reusable AI Arbitration on GenLayer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+:root{
+  --bg:#12151A; --surface:#1B1F27; --surface-2:#232833;
+  --rail-idle:#3A4150; --rail-live:#7DD3FC; --rail-glow:#7DD3FCaa;
+  --sig-red:#E85C4A; --sig-red-bg:#3a2320;
+  --sig-amber:#F0A83C; --sig-amber-bg:#3a2f18;
+  --sig-green:#4ADE80; --sig-green-bg:#173a26;
+  --text:#E7EAF0; --muted:#8B93A5; --muted-2:#5C6474;
+  --display:"Space Grotesk",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;}
+
+.header{background:var(--surface);border-bottom:1px solid #2A3040;}
+.header-inner{max-width:760px;margin:0 auto;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:22px;height:22px;position:relative;}
+.brand-mark::before{content:"";position:absolute;top:50%;left:0;right:0;height:2px;background:var(--rail-live);box-shadow:0 0 8px var(--rail-live);}
+.brand-mark::after{content:"";position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--rail-live);box-shadow:0 0 10px var(--rail-live);}
+.brand-name{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.01em;}
+.brand-sub{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.wallet{text-align:right;}
+.addr{font-family:var(--mono);font-size:12px;color:#B9C4D6;background:var(--surface-2);padding:5px 9px;border-radius:5px;}
+.btn{font-family:var(--body);font-weight:600;font-size:13px;padding:9px 16px;border-radius:6px;border:none;cursor:pointer;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--rail-live);color:#0A1520;}
+.btn-secondary{background:var(--surface-2);color:var(--text);border:1px solid #2E3646;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid #2E3646;}
+.full-addr{font-family:var(--mono);font-size:10px;color:var(--muted-2);margin-top:5px;word-break:break-all;max-width:210px;}
+
+.hero{max-width:760px;margin:0 auto;padding:28px 20px 6px;}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;color:var(--rail-live);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
+.hero h1{font-family:var(--display);font-size:26px;line-height:1.2;margin:0 0 8px;}
+.hero p{color:var(--muted);font-size:14px;line-height:1.55;margin:0;max-width:560px;}
+
+.track-wrap{max-width:760px;margin:24px auto 0;padding:0 20px;overflow-x:auto;}
+.track{display:flex;align-items:center;min-width:520px;padding:10px 0 22px;}
+.station{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+.lamp{width:16px;height:16px;border-radius:50%;background:var(--rail-idle);border:2px solid #2A3040;transition:all .3s;z-index:2;}
+.lamp.live{background:var(--rail-live);border-color:var(--rail-live);box-shadow:0 0 12px 2px var(--rail-glow);}
+.lamp.red{background:var(--sig-red);border-color:var(--sig-red);box-shadow:0 0 12px 2px var(--sig-red);}
+.lamp.amber{background:var(--sig-amber);border-color:var(--sig-amber);box-shadow:0 0 12px 2px var(--sig-amber);}
+.lamp.green{background:var(--sig-green);border-color:var(--sig-green);box-shadow:0 0 12px 2px var(--sig-green);}
+.rail-seg{position:absolute;top:7px;left:50%;width:100%;height:2px;background:var(--rail-idle);z-index:1;}
+.rail-seg.live{background:var(--rail-live);box-shadow:0 0 6px var(--rail-live);}
+.station:last-child .rail-seg{display:none;}
+.station-label{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:9px;text-transform:uppercase;letter-spacing:.06em;text-align:center;}
+.station-label.active{color:var(--text);}
+
+.status-line{max-width:760px;margin:6px auto 0;padding:0 20px;}
+.status-badge{display:inline-block;font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:5px;}
+.badge-idle{background:var(--surface-2);color:var(--muted);}
+.badge-live{background:#123044;color:var(--rail-live);}
+.badge-red{background:var(--sig-red-bg);color:var(--sig-red);}
+.badge-amber{background:var(--sig-amber-bg);color:var(--sig-amber);}
+.badge-green{background:var(--sig-green-bg);color:var(--sig-green);}
+
+.main{max-width:760px;margin:0 auto;padding:22px 20px 60px;}
+.alert{border-radius:6px;padding:12px 16px;font-size:12px;margin-bottom:16px;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);line-height:1.5;background:var(--sig-red-bg);color:var(--sig-red);}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid #2A3040;overflow-x:auto;}
+.tab{background:none;border:none;color:var(--muted);font-family:var(--body);font-size:13px;font-weight:600;padding:11px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
+.tab-active{color:var(--text);border-bottom-color:var(--rail-live);}
+
+.panel{background:var(--surface);border:1px solid #242A36;border-top:none;border-radius:0 0 10px 10px;padding:22px;}
+.panel h2{font-family:var(--display);font-size:18px;margin:0 0 10px;}
+.muted{color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:16px;}
+.data-block{background:var(--surface-2);border-radius:6px;padding:14px;margin-bottom:14px;}
+.data-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.data-value{font-size:13px;line-height:1.5;}
+.field-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #242A36;gap:14px;}
+.field-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;}
+.field-value{font-family:var(--mono);font-size:12px;text-align:right;word-break:break-all;}
+.input{width:100%;font-family:var(--mono);font-size:13px;padding:11px 13px;border:1px solid #2E3646;border-radius:6px;background:#0F1319;color:var(--text);margin-bottom:12px;}
+.hint{font-size:12px;color:var(--muted);margin-top:10px;}
+
+.verdict-box{margin-top:20px;border-radius:8px;padding:18px;position:relative;}
+.verdict-box.red{background:var(--sig-red-bg);border:1px solid #4a2c28;}
+.verdict-box.amber{background:var(--sig-amber-bg);border:1px solid #4a3a22;}
+.verdict-box.green{background:var(--sig-green-bg);border:1px solid #1f4a30;}
+.verdict-label{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.verdict-label.red{color:var(--sig-red);} .verdict-label.amber{color:var(--sig-amber);} .verdict-label.green{color:var(--sig-green);}
+.verdict-text{font-size:14px;line-height:1.6;color:var(--text);}
+
+.footer{text-align:center;color:var(--muted-2);font-size:11px;padding:22px;}
+.footer a{color:var(--rail-live);text-decoration:none;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+const app = document.getElementById("app");
+
+function showFatalError(title, err) {
+  app.innerHTML = `
+    <div style="max-width:640px;margin:60px auto;padding:24px;background:#2a1616;border:1px solid #5c2b2b;border-radius:8px;color:#f4c9c9;font-family:monospace;font-size:13px;line-height:1.6;">
+      <div style="font-weight:bold;font-size:15px;margin-bottom:10px;">${title}</div>
+      <div style="white-space:pre-wrap;word-break:break-word;">${(err && (err.stack || err.message || err)) || "Unknown error"}</div>
+    </div>
+  `;
+}
+
+let createClient, createGenLayerAccount, generatePrivateKey, studionet;
+
+try {
+  const core = await import("https://esm.sh/genlayer-js");
+  createClient = core.createClient;
+  createGenLayerAccount = core.createAccount;
+  generatePrivateKey = core.generatePrivateKey;
+} catch (err) {
+  showFatalError("Failed to load genlayer-js core module from esm.sh", err);
+  throw err;
+}
+
+try {
+  const chains = await import("https://esm.sh/genlayer-js/chains");
+  studionet = chains.studionet;
+} catch (err) {
+  showFatalError("Failed to load genlayer-js/chains module from esm.sh", err);
+  throw err;
+}
+
+// ====== CONFIGURE THIS ======
+const CONTRACT_ADDRESS = "0xd9Ff80C0A0acc82CBD603E27DB447289329665aa";
+// =============================
+
+const STORAGE_KEY = "trustrail_privkey";
+
+function getStoredAccount() {
+  const pk = localStorage.getItem(STORAGE_KEY);
+  return pk ? createGenLayerAccount(pk) : null;
+}
+function createNewAccount() {
+  const pk = generatePrivateKey();
+  localStorage.setItem(STORAGE_KEY, pk);
+  return createGenLayerAccount(pk);
+}
+function clearAccount() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+class TrustRailContract {
+  constructor(account) {
+    this.client = createClient({ chain: studionet, ...(account ? { account } : {}) });
+  }
+  updateAccount(account) {
+    this.client = createClient({ chain: studionet, account });
+  }
+  async read(fn) {
+    return await this.client.readContract({ address: CONTRACT_ADDRESS, functionName: fn, args: [] });
+  }
+  getCaseDescription() { return this.read("get_case_description"); }
+  getCriteria() { return this.read("get_criteria"); }
+  getStatus() { return this.read("get_status"); }
+  getEvidence() { return this.read("get_evidence"); }
+  getVerdict() { return this.read("get_verdict"); }
+  getOutcomePercent() { return this.read("get_outcome_percent"); }
+  getAmount() { return this.read("get_amount"); }
+  getBalance() { return this.read("get_balance"); }
+
+  async fundCase(valueRaw) {
+    const hash = await this.client.writeContract({ address: CONTRACT_ADDRESS, functionName: "fund_case", args: [], value: valueRaw });
+    return await this.client.waitForTransactionReceipt({ hash, status: "ACCEPTED", interval: 5000, retries: 60 });
+  }
+  async submitEvidence(url) {
+    const hash = await this.client.writeContract({ address: CONTRACT_ADDRESS, functionName: "submit_evidence", args: [url] });
+    return await this.client.waitForTransactionReceipt({ hash, status: "ACCEPTED", interval: 5000, retries: 60 });
+  }
+  async resolve() {
+    const hash = await this.client.writeContract({ address: CONTRACT_ADDRESS, functionName: "resolve", args: [] });
+    return await this.client.waitForTransactionReceipt({ hash, status: "ACCEPTED", interval: 5000, retries: 120 });
+  }
+}
+
+let account = getStoredAccount();
+let contract = new TrustRailContract(account);
+let state = {
+  caseDescription: "", criteria: "", status: null, evidence: "", verdict: "",
+  outcomePercent: null, amount: null, balance: null,
+  loading: false, error: "", tab: "case",
+};
+
+const shortAddr = (a) => (a ? a.slice(0, 6) + "…" + a.slice(-4) : "");
+
+const STATIONS = ["fund", "evidence", "resolve", "verdict"];
+function stationIndex(status) {
+  if (status === "awaiting_funding") return 0;
+  if (status === "open") return 1;
+  if (status === "evidence_submitted") return 2;
+  if (["resolved_initiator", "resolved_respondent", "resolved_split"].includes(status)) return 3;
+  return 0;
+}
+function outcomeColor(status) {
+  if (status === "resolved_respondent") return "green";
+  if (status === "resolved_initiator") return "red";
+  if (status === "resolved_split") return "amber";
+  return null;
+}
+function statusBadgeClass(s) {
+  const c = outcomeColor(s);
+  if (c) return "badge-" + c;
+  if (s === "evidence_submitted") return "badge-live";
+  if (s === "open") return "badge-live";
+  return "badge-idle";
+}
+function statusLabel(s) {
+  return ({
+    awaiting_funding: "Awaiting funding from initiator",
+    open: "Funded — awaiting evidence from respondent",
+    evidence_submitted: "Evidence submitted — ready to resolve",
+    resolved_respondent: "Resolved — verdict favors respondent",
+    resolved_initiator: "Resolved — verdict favors initiator",
+    resolved_split: "Resolved — split outcome",
+  }[s] || "Loading…");
+}
+
+async function refresh() {
+  try {
+    state.caseDescription = await contract.getCaseDescription();
+    state.criteria = await contract.getCriteria();
+    state.status = await contract.getStatus();
+    state.evidence = await contract.getEvidence();
+    state.verdict = await contract.getVerdict();
+    state.outcomePercent = await contract.getOutcomePercent();
+    state.amount = await contract.getAmount();
+    state.balance = await contract.getBalance();
+    state.error = "";
+  } catch (e) {
+    state.error = "Could not load case state.\n\n" + (e.name || "") + " " + (e.message || String(e));
+  }
+  render();
+}
+
+function connectWallet() { account = createNewAccount(); contract.updateAccount(account); render(); }
+function disconnectWallet() { clearAccount(); account = null; contract.updateAccount(null); render(); }
+
+async function handleFund() {
+  state.loading = true; state.error = ""; render();
+  try { await contract.fundCase(state.amount); await refresh(); }
+  catch (e) { state.error = "Funding failed: " + e.message; }
+  state.loading = false; render();
+}
+async function handleSubmitEvidence(url) {
+  state.loading = true; state.error = ""; render();
+  try { await contract.submitEvidence(url); await refresh(); }
+  catch (e) { state.error = "Submit failed: " + e.message; }
+  state.loading = false; render();
+}
+async function handleResolve() {
+  state.loading = true; state.error = ""; render();
+  try { await contract.resolve(); await refresh(); }
+  catch (e) { state.error = "Resolve failed: " + e.message; }
+  state.loading = false; render();
+}
+
+function renderTrack() {
+  const idx = stationIndex(state.status);
+  const labels = ["Fund", "Evidence", "Resolve", "Verdict"];
+  return `<div class="track-wrap"><div class="track">
+    ${labels.map((l, i) => {
+      let lampClass = "";
+      if (i < idx) lampClass = "live";
+      if (i === idx) {
+        const oc = outcomeColor(state.status);
+        lampClass = oc ? oc : "live";
+      }
+      const segLive = i < idx ? "live" : "";
+      return `<div class="station">
+        <div class="rail-seg ${segLive}"></div>
+        <div class="lamp ${lampClass}"></div>
+        <div class="station-label ${i <= idx ? "active" : ""}">${l}</div>
+      </div>`;
+    }).join("")}
+  </div></div>`;
+}
+
+function renderTab() {
+  if (state.tab === "case") {
+    return `<h2>Case File</h2>
+      <div class="data-block"><div class="data-label">Case Description</div><div class="data-value">${state.caseDescription || "…"}</div></div>
+      <div class="data-block"><div class="data-label">Evaluation Criteria</div><div class="data-value">${state.criteria || "…"}</div></div>
+      <div class="field-row"><span class="field-label">Status</span><span class="field-value">${state.status ?? "…"}</span></div>
+      <div class="field-row"><span class="field-label">Case amount</span><span class="field-value">${state.amount ?? "…"}</span></div>
+      <div class="field-row"><span class="field-label">Case balance</span><span class="field-value">${state.balance ?? "…"}</span></div>
+      <div class="field-row"><span class="field-label">Submitted evidence</span><span class="field-value">${state.evidence || "— none yet —"}</span></div>
+      ${state.status === "awaiting_funding" ? `<button id="fund-btn" class="btn btn-primary" ${state.loading ? "disabled" : ""}>${state.loading ? "Funding…" : "Fund Case"}</button><p class="hint">Initiator only.</p>` : ""}
+      <button id="refresh-btn" class="btn btn-secondary" style="margin-top:10px;">Refresh</button>`;
+  }
+  if (state.tab === "evidence") {
+    return `<h2>Submit Evidence</h2>
+      <p class="muted">Respondent only. Paste a public URL — validators fetch and read its live content against the case criteria, not just the link.</p>
+      <input id="evidence-input" class="input" type="url" placeholder="https://..." />
+      <button id="submit-btn" class="btn btn-primary" ${state.loading ? "disabled" : ""}>${state.loading ? "Submitting…" : "Submit Evidence"}</button>`;
+  }
+  if (state.tab === "resolve") {
+    const oc = outcomeColor(state.status);
+    return `<h2>Resolve & Verdict</h2>
+      <p class="muted">Either party can trigger resolution once evidence is submitted. Validators independently evaluate the evidence against the case criteria and reach consensus.</p>
+      <button id="resolve-btn" class="btn btn-primary" ${state.loading ? "disabled" : ""}>${state.loading ? "Resolving (consensus in progress)…" : "Resolve"}</button>
+      ${state.verdict ? `<div class="verdict-box ${oc || ""}"><div class="verdict-label ${oc || ""}">Verdict — ${state.outcomePercent}% to respondent</div><div class="verdict-text">${state.verdict}</div></div>` : `<p class="hint">No verdict yet.</p>`}`;
+  }
+}
+
+function render() {
+  app.innerHTML = `
+    <header class="header"><div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div><div class="brand-name">TrustRail</div><div class="brand-sub">arbitration infrastructure</div></div>
+      </div>
+      <div class="wallet">
+        ${account
+          ? `<span class="addr">${shortAddr(account.address)}</span> <button id="disconnect-btn" class="btn btn-ghost">Disconnect</button><div class="full-addr">${account.address}</div>`
+          : `<button id="connect-btn" class="btn btn-primary">Connect Wallet</button>`}
+      </div>
+    </div></header>
+
+    <div class="hero">
+      <div class="hero-eyebrow">GenLayer · Reusable Intelligent Contract</div>
+      <h1>A dispute doesn't need a new arbitrator every time.</h1>
+      <p>TrustRail is a domain-agnostic AI-arbitration primitive. Any builder deploys a case instance — freelance work, bounties, insurance claims, SLA compliance — with their own criteria, instead of writing consensus logic from scratch.</p>
+    </div>
+
+    ${renderTrack()}
+
+    <div class="status-line">
+      <span class="status-badge ${statusBadgeClass(state.status)}">${statusLabel(state.status)}</span>
+    </div>
+
+    <main class="main">
+      ${state.error ? `<div class="alert">${state.error}</div>` : ""}
+      <nav class="tabs">
+        <button data-tab="case" class="tab ${state.tab === "case" ? "tab-active" : ""}">Case File</button>
+        <button data-tab="evidence" class="tab ${state.tab === "evidence" ? "tab-active" : ""}">Submit Evidence</button>
+        <button data-tab="resolve" class="tab ${state.tab === "resolve" ? "tab-active" : ""}">Resolve & Verdict</button>
+      </nav>
+      <section class="panel">${renderTab()}</section>
+    </main>
+
+    <footer class="footer">Built on <a href="#">GenLayer</a> — any contract can deploy a TrustRail case instead of writing its own arbitration logic.</footer>
+  `;
+
+  document.getElementById("connect-btn")?.addEventListener("click", connectWallet);
+  document.getElementById("disconnect-btn")?.addEventListener("click", disconnectWallet);
+  document.getElementById("refresh-btn")?.addEventListener("click", refresh);
+  document.getElementById("fund-btn")?.addEventListener("click", handleFund);
+  document.getElementById("resolve-btn")?.addEventListener("click", handleResolve);
+  document.getElementById("submit-btn")?.addEventListener("click", () => {
+    const url = document.getElementById("evidence-input").value.trim();
+    if (url) handleSubmitEvidence(url);
+  });
+  document.querySelectorAll(".tab").forEach((el) => el.addEventListener("click", () => { state.tab = el.dataset.tab; render(); }));
+}
+
+try {
+  render();
+  refresh();
+} catch (err) {
+  showFatalError("App failed to start", err);
+}
+</script>
+</body>
+</html>
