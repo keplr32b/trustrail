@@ -131,7 +131,9 @@ try {
 }
 
 // ====== CONFIGURE THIS ======
-const CONTRACT_ADDRESS = "0x0eF43B8D60c41c89E8B14Ca8D9Fee8B750601188";
+const DEFAULT_CONTRACT_ADDRESS = "0x92565ebB0a44BF69669390A79CDF56010a84c63B";
+const urlParams = new URLSearchParams(window.location.search);
+const CONTRACT_ADDRESS = urlParams.get("contract") || DEFAULT_CONTRACT_ADDRESS;
 // =============================
 
 const STORAGE_KEY = "trustrail_privkey";
