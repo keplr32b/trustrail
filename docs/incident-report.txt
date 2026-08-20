@@ -1,0 +1,21 @@
+INCIDENT REPORT — Laptop Damage Claim #IC-2026-0819
+
+Customer: J. Kappy
+Device: 14" laptop, purchased under accident-protection plan
+
+Description of incident:
+The laptop was accidentally knocked off a desk on August 15, 2026,
+resulting in visible physical damage to the display. The screen shows
+a large diagonal crack running from the top-left corner to the center
+of the panel, with a smaller spiderweb fracture pattern radiating from
+the impact point near the top edge. The display still powers on but
+shows discoloration and a dark band across the cracked area, consistent
+with internal panel damage from blunt impact.
+
+Repair shop assessment:
+The technician confirmed the damage is consistent with a drop/impact
+event, not a manufacturing defect or wear-related issue. The LCD panel
+requires full replacement. Estimated repair cost: $210.
+
+Photos and the original repair invoice are on file with the claim
+reference number above.
