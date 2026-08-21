@@ -70,14 +70,14 @@ If you're deploying your own case, edit the `CONTRACT_ADDRESS` constant near the
 
 - Only a single evidence URL is supported per case right now. Multi-source evidence (like cross-referencing several URLs) is a reasonable extension.
 
-- No appeal mechanism yet — resolution is final once `resolve()` is called.
+- No appeal mechanism yet - resolution is final once `resolve()` is called.
 
 ## Reusability proof - same contract, two unrelated domains
 
 To prove this is genuinely reusable and not a relabeled single-purpose escrow, the **exact same contract code** was deployed twice for two unrelated domains, with no code changes - only different constructor
 arguments:
 
-**Case 1 — Open-source bounty verification**
+**Case 1 - Open-source bounty verification**
 `0x0eF43B8D60c41c89E8B14Ca8D9Fee8B750601188`
 Evidence: a generic "Hello World" page with no relevant code.
 Verdict: `0%` to respondent — correctly rejected, full refund to initiator.
