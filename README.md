@@ -54,7 +54,7 @@ trustrail/
 
 Open `index.html` in a browser - it imports `genlayer-js` directly from a CDN via ES modules, so no `npm install` or build step is required. It's already wired to the deployed contract address above. This repo's live demo is hosted via GitHub Pages.
 
-The frontend generates and persists a throwaway private key in the browser's `localStorage` on first "Connect Wallet" - in this deployment that generated address is the **respondent** account listed above, so `submit_evidence` and `resolve` can be called directly from the frontend.
+The frontend supports importing a real private key for an authorized party, or generating a fresh one for a new case — see "Connecting as an authorized party" below for details.
 
 `fund_case` is initiator-only and was executed from the initiator account via GenLayer Studio - both are real, independently controlled accounts matching the configuration documented above.
 
@@ -88,6 +88,38 @@ Verdict: `100%` to respondent - correctly approved, full payment released.
 Live: `https://keplr32b.github.io/trustrail/`
 
 Same contract, same consensus logic, opposite verdicts, both correctly reasoned against domain-specific criteria that were never hardcoded into the contract.
+
+## Connecting as an authorized party
+
+The frontend does not rely on a randomly-generated throwaway wallet to act as a case party. On first load it offers two options:
+
+1. Import Private Key - paste the private key of a real, pre-existing account that already holds the initiator or respondent role on a deployed case. This is how any genuine party to a dispute connects - the same way you'd import a wallet into MetaMask to interact with any other dApp.
+
+2. Generate a new identity - a secondary option for deploying and testing a brand-new case, where you control both the initiator and respondent addresses from the start.
+
+The account persists in the browser's localStorage for convenience across reloads, but it is never auto-generated to "stand in" for an authorized party - the address used must already match the role assigned at deploy
+time.
+
+## Fresh-user end-to-end test (reproducible from a clean browser)
+
+This walks through the exact flow a brand-new user - with no prior connection to this repo - can follow to deploy a case, act as respondent, submit evidence, and trigger resolution, entirely from the app:
+
+1. Generate a fresh keypair (e.g. open index.html in a private/incognito window, click "or generate a new identity", then use the full address shown under the wallet badge - tap it to reveal the complete value).
+
+2. In GenLayer Studio, deploy contracts/trustrail_case.py with that address as the respondent, any initiator address you control, your own case_description / criteria_text, and an amount (or 0 for a no-stake case).
+
+3. If amount > 0, call fund_case from the initiator address in
+Studio, sending the exact agreed amount as the transaction value.
+
+4. Back in the same incognito browser session (so the generated key is still in localStorage), open index.html?contract=<your new address>. The wallet badge should already show the respondent address from step 1 - no re-import needed, since it's the same browser session.
+
+5. Go to Submit Evidence, paste any public URL, and submit - this is signed by the respondent key generated in step 1.
+
+6. Go to Resolve & Verdict and click Resolve - either party can
+call this. Wait for consensus; the verdict and, if funded, the actual GEN settlement will appear.
+
+**This is exactly how Case 2 (insurance claim) documented below was produced, end-to-end, from the live app.**
+
 
 ## Testing it end-to-end
 
