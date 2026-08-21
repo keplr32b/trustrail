@@ -29,9 +29,13 @@ A builder deploys their own instance with their own domain-specific criteria tex
 ## How it works
 
 1. **Deploy** - a case is created with an initiator, a respondent, a plain-language case description, domain-specific evaluation criteria, and an optional stake amount.
+
 2. **Fund** *(optional)* - if a stake amount is set, the initiator deposits it via `fund_case()`, a payable method. The contract holds it in custody.
+
 3. **Submit evidence** - the respondent submits a public URL supporting their side of the case.
+
 4. **Resolve** - either party triggers resolution. GenLayer validators independently fetch the evidence, evaluate it against the case's own criteria text (not a hardcoded prompt), and reach consensus via `prompt_non_comparative` - validators agree on the verdict, not on identical wording.
+
 5. **Settle** - if a stake was funded, the contract calls `gl.get_contract_at(...).emit_transfer(...)` to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
 
 ## Why this needs GenLayer
