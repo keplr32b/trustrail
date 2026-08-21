@@ -42,6 +42,15 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);min
 .hero h1{font-family:var(--display);font-size:26px;line-height:1.2;margin:0 0 8px;}
 .hero p{color:var(--muted);font-size:14px;line-height:1.55;margin:0;max-width:560px;}
 
+.uses-section{max-width:760px;margin:22px auto 0;padding:0 20px;}
+.uses-card{background:var(--surface);border:1px solid #242A36;border-radius:10px;padding:20px;}
+.uses-card h3{font-family:var(--display);font-size:15px;margin:0 0 12px;color:var(--rail-live);}
+.uses-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media (max-width:480px){.uses-grid{grid-template-columns:1fr;}}
+.use-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--muted);line-height:1.4;}
+.use-item::before{content:"—";color:var(--rail-live);flex-shrink:0;}
+.uses-cta{margin-top:14px;padding-top:14px;border-top:1px solid #242A36;font-size:12px;color:var(--muted-2);}
+
 .track-wrap{max-width:760px;margin:24px auto 0;padding:0 20px;overflow-x:auto;}
 .track{display:flex;align-items:center;min-width:520px;padding:10px 0 22px;}
 .station{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
@@ -333,6 +342,21 @@ function render() {
       <p>TrustRail is a domain-agnostic AI-arbitration primitive. Any builder deploys a case instance — freelance work, bounties, insurance claims, SLA compliance — with their own criteria, instead of writing consensus logic from scratch.</p>
     </div>
 
+    <div class="uses-section">
+      <div class="uses-card">
+        <h3>WHERE THIS APPLIES</h3>
+        <div class="uses-grid">
+          <div class="use-item">Freelance work — does the deliverable meet the brief</div>
+          <div class="use-item">Open-source bounties — was the task actually completed</div>
+          <div class="use-item">Insurance claims — does the evidence support the claim</div>
+          <div class="use-item">SLA / uptime compliance — was the service level met</div>
+          <div class="use-item">Warranty disputes — is the reported defect genuine</div>
+          <div class="use-item">Any claim-vs-evidence dispute with an on-chain stake</div>
+        </div>
+        <div class="uses-cta">No code changes needed — deploy your own instance with your own case description and criteria. The live case below demonstrates one such deployment.</div>
+      </div>
+    </div>
+
     ${renderTrack()}
 
     <div class="status-line">
@@ -343,33 +367,4 @@ function render() {
       ${state.error ? `<div class="alert">${state.error}</div>` : ""}
       <nav class="tabs">
         <button data-tab="case" class="tab ${state.tab === "case" ? "tab-active" : ""}">Case File</button>
-        <button data-tab="evidence" class="tab ${state.tab === "evidence" ? "tab-active" : ""}">Submit Evidence</button>
-        <button data-tab="resolve" class="tab ${state.tab === "resolve" ? "tab-active" : ""}">Resolve & Verdict</button>
-      </nav>
-      <section class="panel">${renderTab()}</section>
-    </main>
-
-    <footer class="footer">Built on <a href="#">GenLayer</a> — any contract can deploy a TrustRail case instead of writing its own arbitration logic.</footer>
-  `;
-
-  document.getElementById("connect-btn")?.addEventListener("click", connectWallet);
-  document.getElementById("disconnect-btn")?.addEventListener("click", disconnectWallet);
-  document.getElementById("refresh-btn")?.addEventListener("click", refresh);
-  document.getElementById("fund-btn")?.addEventListener("click", handleFund);
-  document.getElementById("resolve-btn")?.addEventListener("click", handleResolve);
-  document.getElementById("submit-btn")?.addEventListener("click", () => {
-    const url = document.getElementById("evidence-input").value.trim();
-    if (url) handleSubmitEvidence(url);
-  });
-  document.querySelectorAll(".tab").forEach((el) => el.addEventListener("click", () => { state.tab = el.dataset.tab; render(); }));
-}
-
-try {
-  render();
-  refresh();
-} catch (err) {
-  showFatalError("App failed to start", err);
-}
-</script>
-</body>
-</html>
+        <button data-tab="evidence" class="tab ${state.tab === "evidence" ? "tab-active" : ""}">Submit Eviden
