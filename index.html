@@ -367,4 +367,33 @@ function render() {
       ${state.error ? `<div class="alert">${state.error}</div>` : ""}
       <nav class="tabs">
         <button data-tab="case" class="tab ${state.tab === "case" ? "tab-active" : ""}">Case File</button>
-        <button data-tab="evidence" class="tab ${state.tab === "evidence" ? "tab-active" : ""}">Submit Eviden
+        <button data-tab="evidence" class="tab ${state.tab === "evidence" ? "tab-active" : ""}">Submit Evidence</button>
+        <button data-tab="resolve" class="tab ${state.tab === "resolve" ? "tab-active" : ""}">Resolve & Verdict</button>
+      </nav>
+      <section class="panel">${renderTab()}</section>
+    </main>
+
+    <footer class="footer">Built on <a href="#">GenLayer</a> — any contract can deploy a TrustRail case instead of writing its own arbitration logic.</footer>
+  `;
+
+  document.getElementById("connect-btn")?.addEventListener("click", connectWallet);
+  document.getElementById("disconnect-btn")?.addEventListener("click", disconnectWallet);
+  document.getElementById("refresh-btn")?.addEventListener("click", refresh);
+  document.getElementById("fund-btn")?.addEventListener("click", handleFund);
+  document.getElementById("resolve-btn")?.addEventListener("click", handleResolve);
+  document.getElementById("submit-btn")?.addEventListener("click", () => {
+    const url = document.getElementById("evidence-input").value.trim();
+    if (url) handleSubmitEvidence(url);
+  });
+  document.querySelectorAll(".tab").forEach((el) => el.addEventListener("click", () => { state.tab = el.dataset.tab; render(); }));
+}
+
+try {
+  render();
+  refresh();
+} catch (err) {
+  showFatalError("App failed to start", err);
+}
+</script>
+</body>
+</html>
