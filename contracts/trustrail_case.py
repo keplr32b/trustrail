@@ -3,6 +3,14 @@ from genlayer import *
 import json
 
 
+@gl.evm.contract_interface
+class _Recipient:
+    class View:
+        pass
+    class Write:
+        pass
+
+
 class TrustRailCase(gl.Contract):
     """
     TrustRail — a reusable AI-arbitration primitive for GenLayer.
@@ -134,9 +142,9 @@ class TrustRailCase(gl.Contract):
             respondent_share = (self.amount * u256(pct)) // u256(100)
             initiator_share = self.amount - respondent_share
             if respondent_share > u256(0):
-                gl.get_contract_at(self.respondent).emit_transfer(value=respondent_share)
+                _Recipient(self.respondent).emit_transfer(value=respondent_share)
             if initiator_share > u256(0):
-                gl.get_contract_at(self.initiator).emit_transfer(value=initiator_share)
+                _Recipient(self.initiator).emit_transfer(value=initiator_share)
 
         if pct == 100:
             self.status = "resolved_respondent"
@@ -176,3 +184,4 @@ class TrustRailCase(gl.Contract):
     @gl.public.view
     def get_balance(self) -> u256:
         return self.balance
+                                        
