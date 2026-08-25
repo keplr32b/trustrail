@@ -35,15 +35,15 @@ A builder deploys their own instance with their own domain-specific criteria tex
 
 ## How it works
 
-1. **Deploy** - a case is created with an initiator, a respondent, a plain-language case description, domain-specific evaluation criteria, and an optional stake amount.
+1. **Deploy:** - a case is created with an initiator, a respondent, a plain-language case description, domain-specific evaluation criteria, and an optional stake amount.
 
-2. **Fund** *(optional)* - if a stake amount is set, the initiator deposits it via `fund_case()`, a payable method. The contract holds it in custody.
+2. **Fund:** *(optional)* - if a stake amount is set, the initiator deposits it via `fund_case()`, a payable method. The contract holds it in custody.
 
-3. **Submit evidence** - the respondent submits a public URL supporting their side of the case.
+3. **Submit evidence:** - the respondent submits a public URL supporting their side of the case.
 
-4. **Resolve** - either party triggers resolution. GenLayer validators independently fetch the evidence, evaluate it against the case's own criteria text (not a hardcoded prompt), and reach consensus via `prompt_non_comparative` - validators agree on the verdict, not on identical wording.
+4. **Resolve:** - either party triggers resolution. GenLayer validators independently fetch the evidence, evaluate it against the case's own criteria text (not a hardcoded prompt), and reach consensus via `prompt_non_comparative` - validators agree on the verdict, not on identical wording.
 
-5. **Settle** - if a stake was funded, the contract calls `gl.get_contract_at(...).emit_transfer(...)` to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
+5. **Settle:** - if a stake was funded, the contract calls `gl.get_contract_at(...).emit_transfer(...)` to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
 
 ## Why this needs GenLayer
 
@@ -90,15 +90,17 @@ To prove this is genuinely reusable and not a relabeled single-purpose escrow, t
 Evidence: a generic "Hello World" page with no relevant code.
 Verdict: `0%` to respondent - correctly rejected, full refund sent to the initiator's actual EOA wallet, verified via transaction
 `0x1ca75cf50387a5a112b38cde035a85346b86a4b8a66dbfaa4a8272d5f7d3b636`.
+
 Live: `https://keplr32b.github.io/trustrail/?contract=0x9E5Cd00B9f2E1dfe1bE097E033e9d5a08f2e79c9`
 
 **Case 2: Insurance claim verification**
-0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8
-Evidence: a detailed incident report describing accidental laptop screen
-damage with a professional repair assessment.
-Verdict: 100% to respondent — correctly approved, full payment sent to
-the respondent's actual EOA wallet (0x870f1c2e54c04494263eC01C23565DaB29c8f038),
+`0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8`
+Evidence: `a detailed incident report describing accidental laptop screen
+damage with a professional repair assessment.`
+Verdict: `100%` to respondent — correctly approved, full payment sent to
+the respondent's actual EOA wallet `0x870f1c2e54c04494263eC01C23565DaB29c8f038`,
 confirmed on-chain as a Send transaction of 1 GEN, FINALIZED.
+
 Live: https://keplr32b.github.io/trustrail/?contract=0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8
 
 Same contract, same consensus logic, opposite verdicts, both correctly reasoned against domain-specific criteria that were never hardcoded into the contract.
