@@ -43,7 +43,7 @@ A builder deploys their own instance with their own domain-specific criteria tex
 
 4. **Resolve** - either party triggers resolution. GenLayer validators independently fetch the evidence, evaluate it against the case's own criteria text (not a hardcoded prompt), and reach consensus via `prompt_non_comparative` - validators agree on the verdict, not on identical wording.
 
-5. **Settle** - if a stake was funded, the contract uses the `@gl.evm.contract_interface ` pattern (the correct mechanism for sending GEN to a plain EOA wallet) to split the stake between initiator and respondent according to the AI's percent_to_respondent verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
+5. **Settle** - if a stake was funded, the contract uses the `@gl.evm.contract_interface ` pattern (the correct mechanism for sending GEN to a plain EOA wallet) to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
 
 ## Why this needs GenLayer
 
