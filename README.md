@@ -1,19 +1,16 @@
 ## TrustRail - Reusable AI-Arbitration Infrastructure for GenLayer.
 
-Every project that needs a dispute resolved - did this freelancer's work meet the brief, did this insurance claim's evidence hold up, was this bounty actually completed - ends up writing the same thing from scratch: fetch some
-evidence, prompt an LLM, wire up `eq_principle` for consensus, handle fund custody and settlement.
+Every project that needs a dispute resolved - did this freelancer's work meet the brief, did this insurance claim's evidence hold up, was this bounty actually completed - ends up writing the same thing from scratch: fetch some evidence, prompt an LLM, wire up `eq_principle` for consensus, handle fund custody and settlement.
 
-TrustRail is that logic, built once, as a reusable
-primitive any builder can deploy against their own case instead of reinventing it.
+TrustRail is that logic, built once, as a reusable primitive any builder can deploy against their own case instead of reinventing it.
 
 **Live contracts (GenLayer Studio) - two deployed case instances proving reuse across domains:**
 - Bounty verification (fixed EOA-transfer version): `0x9E5Cd00B9f2E1dfe1bE097E033e9d5a08f2e79c9`
 - Insurance claim verification (fixed EOA-transfer version): `0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8`
 
-**Note on a fixed bug:** an earlier version of this contract sent settlement value to EOA wallet addresses using `gl.get_contract_at(...)`, which the GenLayer docs specify is for Intelligent-Contract-to-Intelligent-Contract transfers only. 
+**Note on a fixed bug:** an earlier version of this contract sent settlement value to EOA wallet addresses using `gl.get_contract_at(...)`, which the GenLayer docs specify is for Intelligent-Contract-to-Intelligent-Contract transfers only.
 
-Sending to a plain wallet requires the `@gl.evm.contract_
-interface` pattern instead. This has been fixed and verified on-chain: see transaction `0x1ca75cf50387a5a112b38cde035a85346b86a4b8a66dbfaa4a8272d5f7d3b636`, a `Send` transaction of 1 GEN from the contract directly to the initiator's EOA wallet, confirmed `FINALIZED`.
+Sending to a plain wallet requires the `@gl.evm.contract_interface` pattern instead. This has been fixed and verified on-chain: see transaction `0x1ca75cf50387a5a112b38cde035a85346b86a4b8a66dbfaa4a8272d5f7d3b636`, a `Send` transaction of 1 GEN from the contract directly to the initiator's EOA wallet, confirmed `FINALIZED`.
 
 **Accounts used in the live demo:**
 - **Initiator:** `0xCa44BB8223A7d15e1B3777Bac319f03f9aEC9D91`
@@ -21,8 +18,7 @@ interface` pattern instead. This has been fixed and verified on-chain: see trans
 
 ## What makes this different from a single-purpose escrow
 
-FairEscrow-style contracts hardcode one domain: "does this deliverable match this brief." TrustRail takes the **case description** and **evaluation criteria** as constructor arguments instead of hardcoding them, so the same
-contract pattern works for:
+FairEscrow-style contracts hardcode one domain: "does this deliverable match this brief." TrustRail takes the **case description** and **evaluation criteria** as constructor arguments instead of hardcoding them, so the same contract pattern works for:
 
 - Freelance work verification
 - Open-source bounty completion
@@ -39,11 +35,11 @@ A builder deploys their own instance with their own domain-specific criteria tex
 
 2. **Fund** *(optional)* - if a stake amount is set, the initiator deposits it via `fund_case()`, a payable method. The contract holds it in custody.
 
-3. **Submit evidence:** - the respondent submits a public URL supporting their side of the case.
+3. **Submit evidence** - the respondent submits a public URL supporting their side of the case.
 
 4. **Resolve** - either party triggers resolution. GenLayer validators independently fetch the evidence, evaluate it against the case's own criteria text (not a hardcoded prompt), and reach consensus via `prompt_non_comparative` - validators agree on the verdict, not on identical wording.
 
-5. **Settle** - if a stake was funded, the contract uses the `@gl.evm.contract_interface ` pattern (the correct mechanism for sending GEN to a plain EOA wallet) to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
+5. **Settle** - if a stake was funded, the contract uses the `@gl.evm.contract_interface` pattern (the correct mechanism for sending GEN to a plain EOA wallet) to split the stake between initiator and respondent according to the AI's `percent_to_respondent` verdict, in the same transaction. If no funds were involved, it just records the verdict on-chain as a verifiable outcome.
 
 ## Why this needs GenLayer
 
@@ -56,13 +52,13 @@ GenLayer's Intelligent Contracts make that judgment possible, with decentralized
 ```
 trustrail/
 ├── contracts/
-│   └── trustrail_case.py       # the reusable Intelligent
+│   └── trustrail_case.py       # reusable Intelligent Contract
 ├── docs/
-│   └── incident-report.txt      # sample evidence used in the insurance-claim demo case
+│   └── incident-report.txt     # sample evidence used in the insurance-claim demo case
 ├── tests/
-│   └── test_trustrail_e2e.py    # automated gltest suite
+│   └── test_trustrail_e2e.py   # automated gltest suite
 ├── README.md
-└── index.html                    # standalone frontend (no build step needed)
+└── index.html                  # standalone frontend (no build step needed)
 ```
 
 ## How to run the frontend
@@ -85,23 +81,19 @@ If you're deploying your own case, edit the `CONTRACT_ADDRESS` constant near the
 
 To prove this is genuinely reusable and not a relabeled single-purpose escrow, the **exact same contract code** was deployed twice for two unrelated domains, with no code changes - only different constructor arguments:
 
-**Case 1: Open-source bounty verification**
-`0x9E5Cd00B9f2E1dfe1bE097E033e9d5a08f2e79c9`
-Evidence: a generic "Hello World" page with no relevant code.
-Verdict: `0%` to respondent - correctly rejected, full refund sent to the initiator's actual EOA wallet, verified via transaction
-`0x1ca75cf50387a5a112b38cde035a85346b86a4b8a66dbfaa4a8272d5f7d3b636`.
+**Case 1: Open-source bounty verification**  
+`0x9E5Cd00B9f2E1dfe1bE097E033e9d5a08f2e79c9`  
+Evidence: a generic "Hello World" page with no relevant code.  
+Verdict: `0%` to respondent - correctly rejected, full refund sent to the initiator's actual EOA wallet, verified via transaction `0x1ca75cf50387a5a112b38cde035a85346b86a4b8a66dbfaa4a8272d5f7d3b636`.
 
 Live: `https://keplr32b.github.io/trustrail/?contract=0x9E5Cd00B9f2E1dfe1bE097E033e9d5a08f2e79c9`
 
-**Case 2: Insurance claim verification**
-`0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8`
-Evidence: a detailed incident report describing accidental laptop screen
-damage with a professional repair assessment.
-Verdict: `100%` to respondent — correctly approved, full payment sent to
-the respondent's actual EOA wallet `0x870f1c2e54c04494263eC01C23565DaB29c8f038`,
-confirmed on-chain as a Send transaction of 1 GEN, FINALIZED.
+**Case 2: Insurance claim verification**  
+`0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8`  
+Evidence: a detailed incident report describing accidental laptop screen damage with a professional repair assessment.  
+Verdict: `100%` to respondent — correctly approved, full payment sent to the respondent's actual EOA wallet `0x870f1c2e54c04494263eC01C23565DaB29c8f038`, confirmed on-chain as a Send transaction of 1 GEN, FINALIZED.
 
-Live: https://keplr32b.github.io/trustrail/?contract=0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8
+Live: `https://keplr32b.github.io/trustrail/?contract=0x9805fc524368bdEFbB2D95366C1beaFCb3dB23F8`
 
 Same contract, same consensus logic, opposite verdicts, both correctly reasoned against domain-specific criteria that were never hardcoded into the contract.
 
@@ -131,7 +123,7 @@ This walks through the exact flow a brand-new user - with no prior connection to
 
 6. Go to **Resolve & Verdict** and click **Resolve** - either party can call this. Wait for consensus; the verdict and, if funded, the actual GEN settlement will appear.
 
-This is exactly how **Case 2 (insurance claim)** documented below was produced, end-to-end, from the live app.
+This is exactly how **Case 2 (insurance claim)** documented above was produced, end-to-end, from the live app.
 
 ## Automated tests
 
@@ -144,22 +136,16 @@ This is exactly how **Case 2 (insurance claim)** documented below was produced, 
 - **Unfunded rejection**: evidence submission is confirmed to fail if the case was never funded.
 
 Run with:
-```bash
+
+```
 pip install genlayer-test
 gltest tests/test_trustrail_e2e.py
 ```
 
-## Testing it end-to-end
-
-1. Deploy `contracts/trustrail_case.py` in GenLayer Studio with your initiator, respondent, case description, criteria text, and amount (in wei-equivalent units, or `0` for a verdict-only case with no funds).
-
-2. If `amount > 0`, call `fund_case` from the **initiator** address, sending exactly the agreed amount as the transaction value.
-
-3. Call `submit_evidence` from the **respondent** address with a public URL.
-
-4. Call `resolve` from either party. This fetches the evidence, gets an AI verdict against your own criteria text, and — if funded - transfers GEN accordingly.
-
-5. Call `get_status` / `get_verdict` / `get_outcome_percent` / `get_balance` to see the outcome and reasoning.
-
-This was tested using a bounty-verification case (case description:
-implement binary search with edge-case handling and tests) against a deliberately mismatched evidence URL - the AI correctly returned `0%` to the respondent with reasoning explaining the evidence contained no relevant code, and the full staked amount was returned to the initiator on-chain.
+Testing it end-to-end
+Deploy contracts/trustrail_case.py in GenLayer Studio with your initiator, respondent, case description, criteria text, and amount (in wei-equivalent units, or 0 for a verdict-only case with no funds).
+If amount > 0, call fund_case from the initiator address, sending exactly the agreed amount as the transaction value.
+Call submit_evidence from the respondent address with a public URL.
+Call resolve from either party. This fetches the evidence, gets an AI verdict against your own criteria text, and — if funded — transfers GEN accordingly.
+Call get_status / get_verdict / get_outcome_percent / get_balance to see the outcome and reasoning.
+This was tested using a bounty-verification case (case description: implement binary search with edge-case handling and tests) against a deliberately mismatched evidence URL - the AI correctly returned 0% to the respondent with reasoning explaining the evidence contained no relevant code, and the full staked amount was returned to the initiator on-chain.
