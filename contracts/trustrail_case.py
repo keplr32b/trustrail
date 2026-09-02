@@ -10,7 +10,6 @@ class _Recipient:
     class Write:
         pass
 
-
 class TrustRailCase(gl.Contract):
     """
     TrustRail — a reusable AI-arbitration primitive for GenLayer.
